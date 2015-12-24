@@ -147,6 +147,7 @@ static const int kInputChannelsChangedContext;
         // Create an audio unit channel (a file player)
         self.audioUnitPlayer = [[AEAudioUnitChannel alloc] initWithComponentDescription:AEAudioComponentDescriptionMake(kAudioUnitManufacturer_Apple, kAudioUnitType_Generator, kAudioUnitSubType_AudioFilePlayer)];
         
+        // 创建一个group,并将channels加入group(可以群组控制)
         // Create a group for loop1, loop2 and oscillator
         _group = [_audioController createChannelGroup];
         [_audioController addChannels:@[_loop1, _loop2, _oscillator] toChannelGroup:_group];
@@ -291,7 +292,7 @@ static const int kInputChannelsChangedContext;
             
             switch ( indexPath.row ) {
                 case 0: {
-                    cell.textLabel.text = @"Drums";
+                    cell.textLabel.text = @"Drums(用AEAudioFilePlayer循环播放本地音频)";
                     onSwitch.on = !_loop1.channelIsMuted;
                     slider.value = _loop1.volume;
                     [onSwitch addTarget:self action:@selector(loop1SwitchChanged:) forControlEvents:UIControlEventValueChanged];
@@ -299,7 +300,7 @@ static const int kInputChannelsChangedContext;
                     break;
                 }
                 case 1: {
-                    cell.textLabel.text = @"Organ";
+                    cell.textLabel.text = @"Organ(用AEAudioFilePlayer循环播放本地音频)";
                     onSwitch.on = !_loop2.channelIsMuted;
                     slider.value = _loop2.volume;
                     [onSwitch addTarget:self action:@selector(loop2SwitchChanged:) forControlEvents:UIControlEventValueChanged];
@@ -307,7 +308,7 @@ static const int kInputChannelsChangedContext;
                     break;
                 }
                 case 2: {
-                    cell.textLabel.text = @"Oscillator";
+                    cell.textLabel.text = @"Oscillator(利用AEBlockChannel创建音源(声音数据))";
                     onSwitch.on = !_oscillator.channelIsMuted;
                     slider.value = _oscillator.volume;
                     [onSwitch addTarget:self action:@selector(oscillatorSwitchChanged:) forControlEvents:UIControlEventValueChanged];
@@ -315,7 +316,7 @@ static const int kInputChannelsChangedContext;
                     break;
                 }
                 case 3: {
-                    cell.textLabel.text = @"Group";
+                    cell.textLabel.text = @"Group(上面3个channel加入了group(没有直接加入AE控制器),所以要'打开'group'才行)";
                     onSwitch.on = ![_audioController channelGroupIsMuted:_group];
                     slider.value = [_audioController volumeForChannelGroup:_group];
                     [onSwitch addTarget:self action:@selector(channelGroupSwitchChanged:) forControlEvents:UIControlEventValueChanged];
@@ -334,7 +335,7 @@ static const int kInputChannelsChangedContext;
                     [_oneshotButton sizeToFit];
                     [_oneshotButton setSelected:_oneshot != nil];
                     [_oneshotButton addTarget:self action:@selector(oneshotPlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-                    cell.textLabel.text = @"One Shot";
+                    cell.textLabel.text = @"One Shot(利用AEAudioFilePlayer播放本地音频文件)";
                     break;
                 }
                 case 1: {
@@ -344,7 +345,7 @@ static const int kInputChannelsChangedContext;
                     [_oneshotAudioUnitButton sizeToFit];
                     [_oneshotAudioUnitButton setSelected:_oneshot != nil];
                     [_oneshotAudioUnitButton addTarget:self action:@selector(oneshotAudioUnitPlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-                    cell.textLabel.text = @"One Shot (Audio Unit)";
+                    cell.textLabel.text = @"One Shot (Audio Unit)(利用AEAudioUnitChannel播放本地音频)";
                     break;
                 }
             }
@@ -405,7 +406,7 @@ static const int kInputChannelsChangedContext;
                     break;
                 }
                 case 2: {
-                    cell.textLabel.text = @"Input Gain";
+                    cell.textLabel.text = @"Input Gain(录音的增益?(越大噪声越大))";
                     UISlider *inputGainSlider = [[UISlider alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
                     inputGainSlider.minimumValue = 0.0;
                     inputGainSlider.maximumValue = 1.0;
@@ -420,6 +421,7 @@ static const int kInputChannelsChangedContext;
                     [((UISwitch*)cell.accessoryView) addTarget:self action:@selector(sampleRateSwitchChanged:) forControlEvents:UIControlEventValueChanged];
                     break;
                 }
+#pragma mark - 识别出有几个输出\出入声道？
                 case 4: {
                     cell.textLabel.text = @"Channels";
                     
